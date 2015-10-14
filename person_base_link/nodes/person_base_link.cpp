@@ -9,8 +9,6 @@ class PersonBaseLink
 {
 public:
     typedef kinect_bridge2::KinectBodies _KinectBodiesMsg;
-    typedef kinect_bridge2::KinectBOdy _KinectBodyMsg;
-    typedef kinect_bridge2::KinectJoint _KinectJointMsg;
 
 protected:
     ros::NodeHandle _nh_rel;
@@ -39,7 +37,7 @@ public:
         // calculate projection of target frame into source_frame's x-y plane (so zero out its Z value)
         // publish new base_link frame in original tf namespace
 
-        auto const & bodies = message.bodies;
+        auto const & bodies = message->bodies;
 
         // the bodies are necessarily packed in order and there will necessarily be a constant number of them
         // since bodies (but not necessarily joints) are packed regardless of tracking state
@@ -59,7 +57,7 @@ public:
                 _transform_listener.lookupTransform( _source_frame_name, tf_frame_basename + _target_frame_name, ros::Time( 0 ), target_transform );
 
                 // get the base_link vec projected into the source frame's plane
-                tf::Vector3 base_link_vec( target_transform.getOrigin.getX(), target_transform.getOrigin().getY(), 0 );
+                tf::Vector3 base_link_vec( target_transform.getOrigin().getX(), target_transform.getOrigin().getY(), 0 );
                 tf::Vector3 x_axis_unit_vec( 1, 0, 0 );
                 // get an "orientation" vector in the direction of the x-axis of the target joint's orientation
                 tf::Vector3 base_link_ori_vec( tf::Transform( target_transform.getRotation() ) * x_axis_unit_vec );

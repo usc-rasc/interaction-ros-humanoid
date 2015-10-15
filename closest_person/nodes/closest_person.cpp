@@ -9,8 +9,6 @@ class ClosestPerson
 {
 public:
     typedef kinect_bridge2::KinectBodies _KinectBodiesMsg;
-    typedef kinect_bridge2::KinectBOdy _KinectBodyMsg;
-    typedef kinect_bridge2::KinectJoint _KinectJointMsg;
 
 protected:
     ros::NodeHandle _nh_rel;
@@ -34,12 +32,12 @@ public:
 
     void kinectBodiesCB( _KinectBodiesMsg::ConstPtr const & message )
     {
-        auto const & bodies = message.bodies;
+        auto const & bodies = message->bodies;
 
         // the bodies are necessarily packed in order and there will necessarily be a constant number of them
         // since bodies (but not necessarily joints) are packed regardless of tracking state
         // thus, the body's position in the vector will necessarily be identical to the corresponding tf skeleton index
-        float shortest_distance = std::numeric_limits<float>::max;
+        float shortest_distance = std::numeric_limits<float>::max();
         tf::Transform closest_body_transform;
 
         for( size_t body_idx = 0; body_idx < bodies.size(); ++body_idx )

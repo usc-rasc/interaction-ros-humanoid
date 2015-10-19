@@ -1,0 +1,3 @@
+<launch>
+	<node pkg="closest_person" type="closest_person" name="closest_person" output="screen" args="~kinect_bodies:=/kinect_client/bodies"/>
+</launch>

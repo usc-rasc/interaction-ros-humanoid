@@ -1,0 +1,18 @@
+<package>
+  <description brief="person_base_link">
+
+     person_base_link
+
+  </description>
+  <author>Edward Kaszubski</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/person_base_link</url>
+  <depend package="rosbuild"/>
+  <depend package="roscpp"/>
+  <depend package="tf"/>
+  <depend package="kinect_bridge2"/>
+
+</package>
+
+

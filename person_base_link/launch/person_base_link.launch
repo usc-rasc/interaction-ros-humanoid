@@ -1,0 +1,3 @@
+<launch>
+	<node pkg="person_base_link" type="person_base_link" name="person_base_link" output="screen" args="~kinect_bodies:=/kinect_client/bodies"/>
+</launch>

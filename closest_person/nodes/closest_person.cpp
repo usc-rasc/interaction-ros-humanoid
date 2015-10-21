@@ -38,7 +38,9 @@ public:
         // since bodies (but not necessarily joints) are packed regardless of tracking state
         // thus, the body's position in the vector will necessarily be identical to the corresponding tf skeleton index
         float shortest_distance = std::numeric_limits<float>::max();
-        tf::Transform closest_body_transform( tf::Quaternion( 0, 0, 0, 1 ), tf::Vector3( 0, 0, 0 ) );
+        tf::Transform closest_body_transform;
+
+        bool person_found = false;
 
         for( size_t body_idx = 0; body_idx < bodies.size(); ++body_idx )
         {
@@ -67,13 +69,16 @@ public:
                 {
                     shortest_distance = body_distance;
                     closest_body_transform = target_transform;
+                    person_found = true;
                 }
-
             }
         }
 
-        // publish base link transform
-        _transform_broadcaster.sendTransform( tf::StampedTransform( closest_body_transform, ros::Time::now(), _source_frame_name, "/closest_person/" + _target_frame_name ) );
+        if( person_found )
+        {
+            // publish base link transform
+            _transform_broadcaster.sendTransform( tf::StampedTransform( closest_body_transform, ros::Time::now(), _source_frame_name, "/closest_person/" + _target_frame_name ) );
+        }
     }
 
     void spinOnce()

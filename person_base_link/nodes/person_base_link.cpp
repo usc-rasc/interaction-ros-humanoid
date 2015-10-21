@@ -54,7 +54,15 @@ public:
 
                 tf::StampedTransform target_transform;
                 // get transform from source to target
-                _transform_listener.lookupTransform( _source_frame_name, tf_frame_basename + _target_frame_name, ros::Time( 0 ), target_transform );
+                try
+                {
+                    _transform_listener.lookupTransform( _source_frame_name, tf_frame_basename + _target_frame_name, ros::Time( 0 ), target_transform );
+                }
+                catch( tf::TransformException & e )
+                {
+                    ROS_WARN( "transform lookup failed: %s", e.what() );
+                    continue;
+                }
 
                 // get the base_link vec projected into the source frame's plane
                 tf::Vector3 base_link_vec( target_transform.getOrigin().getX(), target_transform.getOrigin().getY(), 0 );
@@ -66,7 +74,7 @@ public:
 
                 // our 2D orientation is just the atan2 of the 2d orientation vector
                 // our 3D orientation is the 2D orientation around the z axis
-                tf::Quaternion base_link_quat( tf::Vector3( 0, 0, 1 ), atan2( base_link_ori_2d_unit_vec.getX(), -base_link_ori_2d_unit_vec.getY() ) );
+                tf::Quaternion base_link_quat( tf::Vector3( 0, 0, 1 ), atan2( base_link_ori_2d_unit_vec.getY(), base_link_ori_2d_unit_vec.getX() ) );
 
                 // publish base link transform
                 _transform_broadcaster.sendTransform( tf::StampedTransform( tf::Transform( base_link_quat, base_link_vec ), ros::Time::now(), _source_frame_name, tf_frame_basename + "base_link" ) );

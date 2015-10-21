@@ -38,7 +38,7 @@ public:
         // since bodies (but not necessarily joints) are packed regardless of tracking state
         // thus, the body's position in the vector will necessarily be identical to the corresponding tf skeleton index
         float shortest_distance = std::numeric_limits<float>::max();
-        tf::Transform closest_body_transform;
+        tf::Transform closest_body_transform( tf::Quaternion( 0, 0, 0, 1 ), tf::Vector3( 0, 0, 0 ) );
 
         for( size_t body_idx = 0; body_idx < bodies.size(); ++body_idx )
         {
@@ -52,7 +52,15 @@ public:
 
                 tf::StampedTransform target_transform;
                 // get transform from source to target
-                _transform_listener.lookupTransform( _source_frame_name, tf_frame_basename + _target_frame_name, ros::Time( 0 ), target_transform );
+                try
+                {
+                    _transform_listener.lookupTransform( _source_frame_name, tf_frame_basename + _target_frame_name, ros::Time( 0 ), target_transform );
+                }
+                catch( tf::TransformException & e )
+                {
+                    ROS_WARN( "transform lookup failed: %s", e.what() );
+                    continue;
+                }
 
                 float body_distance = target_transform.getOrigin().length();
                 if( body_distance < shortest_distance )

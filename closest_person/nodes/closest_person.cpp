@@ -15,6 +15,7 @@ protected:
     ros::Subscriber _kinect_bodies_sub;
     std::string _source_frame_name;
     std::string _target_frame_name;
+    std::string _world_frame_name;
 
     tf::TransformBroadcaster _transform_broadcaster;
     tf::TransformListener _transform_listener;
@@ -25,7 +26,8 @@ public:
         _nh_rel( nh_rel ),
         _kinect_bodies_sub( _nh_rel.subscribe<_KinectBodiesMsg>( "kinect_bodies", 10, &ClosestPerson::kinectBodiesCB, this ) ),
         _source_frame_name( "/ava/base_link" ),
-        _target_frame_name( "base_link" )
+        _target_frame_name( "base_link" ),
+        _world_frame_name( "/world" )
     {
         //
     }
@@ -76,8 +78,17 @@ public:
 
         if( person_found )
         {
-            // publish base link transform
-            _transform_broadcaster.sendTransform( tf::StampedTransform( closest_body_transform, ros::Time::now(), _source_frame_name, "/closest_person/" + _target_frame_name ) );
+            tf::StampedTransform world_to_source_transform;
+            try
+            {
+                _transform_listener.lookupTransform( _world_frame_name, _source_frame_name, ros::Time( 0 ), world_to_source_transform );
+                // publish base link transform
+                _transform_broadcaster.sendTransform( tf::StampedTransform( world_to_source_transform * closest_body_transform, ros::Time::now(), _world_frame_name, "/closest_person/" + _target_frame_name ) );
+            }
+            catch( tf::TransformException & e )
+            {
+                ROS_WARN( "transform lookup failed: %s", e.what() );
+            }
         }
     }
 
